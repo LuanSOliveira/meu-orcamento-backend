@@ -8,27 +8,31 @@ export class LineController {
   constructor(private readonly lineService: LineService) {}
 
   @Post()
-  create(@Body() createLineDto: CreateLineDto) {
-    return this.lineService.create(createLineDto);
+  async create(@Body() createLineDto: CreateLineDto) {
+    const newLine = await this.lineService.create(createLineDto)
+    return {
+      line: newLine,
+      message: "Linha criada com sucesso."
+    }
   }
 
   @Get()
-  findAll() {
+  async indAll() {
     return this.lineService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.lineService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    return this.lineService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateLineDto: UpdateLineDto) {
-    return this.lineService.update(+id, updateLineDto);
+  async update(@Param('id') id: string, @Body() updateLineDto: UpdateLineDto) {
+    return this.lineService.update(id, updateLineDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.lineService.remove(+id);
+  async remove(@Param('id') id: string) {
+    return this.lineService.remove(id);
   }
 }
