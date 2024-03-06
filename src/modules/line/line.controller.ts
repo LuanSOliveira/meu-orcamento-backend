@@ -17,22 +17,33 @@ export class LineController {
   }
 
   @Get()
-  async indAll() {
-    return this.lineService.findAll();
+  async findAll() {
+    return await this.lineService.findAll();
   }
 
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    return this.lineService.findOne(id);
+    return await this.lineService.findOne(id);
   }
 
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateLineDto: UpdateLineDto) {
-    return this.lineService.update(id, updateLineDto);
+    await this.lineService.update(id, updateLineDto)
+    return {
+      line: {
+        id: id,
+        data: updateLineDto,
+      },
+      message: 'Linha atualizada com sucesso.'
+    }
   }
 
   @Delete(':id')
   async remove(@Param('id') id: string) {
-    return this.lineService.remove(id);
+    const deletedLine = await this.lineService.remove(id)
+    return {
+      line: deletedLine,
+      message: 'Linha deletada com sucesso.'
+    }
   }
 }

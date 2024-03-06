@@ -42,6 +42,8 @@ export class LineService {
   }
 
   async remove(id: string) {
+    const deletedLine = await this.lineRepository.findOneBy({id: id})
     await this.lineRepository.delete(id)
+    return deletedLine
   }
 }

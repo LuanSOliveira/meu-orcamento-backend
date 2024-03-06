@@ -36,7 +36,7 @@ export class LineTypeController {
         id: id,
         name: updateLineTypeDto.name
       },
-      mesaage: 'Tipo atualizado com sucesso.'
+      message: 'Tipo atualizado com sucesso.'
     }
   }
 
