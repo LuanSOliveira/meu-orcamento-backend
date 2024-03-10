@@ -11,12 +11,7 @@ export class LineMarkController {
 
   @Post()
   async create(@Body() createLineMarkDto: CreateLineMarkDto) {
-    const newLineMark = await this.lineMarkService.createLineMark(createLineMarkDto)
-
-    return {
-      lineMark: newLineMark,
-      message: "Marca criada com sucesso."
-    }
+    return await this.lineMarkService.createLineMark(createLineMarkDto)
   }
 
   @Get()
@@ -31,22 +26,11 @@ export class LineMarkController {
 
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateLineMarkDto: UpdateLineMarkDto) {
-    await this.lineMarkService.updateLineMark(id, updateLineMarkDto)
-    return{
-      lineMark:{
-        id: id,
-        name: updateLineMarkDto.name
-      },
-      mesaage: 'Marca atualizada com sucesso.'
-    }
+    return await this.lineMarkService.updateLineMark(id, updateLineMarkDto)
   }
 
   @Delete(':id')
   async remove(@Param('id') id: string) {
-    const deletedMark = await this.lineMarkService.deleteLineMark(id)
-    return {
-      lineMark: deletedMark,
-      message: 'Marca deletada com sucesso.'
-    }
+    return await this.lineMarkService.deleteLineMark(id)
   }
 }

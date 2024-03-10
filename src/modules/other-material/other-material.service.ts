@@ -1,26 +1,58 @@
 import { Injectable } from '@nestjs/common';
 import { CreateOtherMaterialDto } from './dto/create-other-material.dto';
 import { UpdateOtherMaterialDto } from './dto/update-other-material.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { OtherMaterialEntity } from './entities/other-material.entity';
+import { Repository } from 'typeorm';
+import { ICreatedData, IDeletedData, IUpdatedData } from 'src/shared/types';
 
 @Injectable()
 export class OtherMaterialService {
-  create(createOtherMaterialDto: CreateOtherMaterialDto) {
-    return 'This action adds a new otherMaterial';
+  constructor(
+    @InjectRepository(OtherMaterialEntity)
+    private readonly otherMaterialRepository: Repository<OtherMaterialEntity>
+  ){}
+
+  async create(createOtherMaterialDto: CreateOtherMaterialDto): Promise<ICreatedData> {
+    const newMaterial = new OtherMaterialEntity()
+    newMaterial.name = createOtherMaterialDto.name
+    newMaterial.type = createOtherMaterialDto.type
+    newMaterial.imageLink = createOtherMaterialDto.imageLink
+    newMaterial.value = createOtherMaterialDto.value
+    newMaterial.weight = createOtherMaterialDto.weight
+    newMaterial.otherInformations = createOtherMaterialDto.otherInformations
+
+    await this.otherMaterialRepository.save(createOtherMaterialDto)
+    return {
+      data: newMaterial,
+      message: 'Mateerial criado com sucesso.'
+    }
   }
 
-  findAll() {
-    return `This action returns all otherMaterial`;
+  async findAll(): Promise<OtherMaterialEntity[]> {
+    return await this.otherMaterialRepository.find()
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} otherMaterial`;
+  async findOne(id: string): Promise<OtherMaterialEntity> {
+    return await this.otherMaterialRepository.findOneBy({id: id})
   }
 
-  update(id: number, updateOtherMaterialDto: UpdateOtherMaterialDto) {
-    return `This action updates a #${id} otherMaterial`;
+  async update(id: string, updateOtherMaterialDto: UpdateOtherMaterialDto): Promise<IUpdatedData> {
+    await this.otherMaterialRepository.update(id, updateOtherMaterialDto)
+    const updatedMaterial = await this.otherMaterialRepository.findOneBy({id: id})
+    return {
+      updateData: updateOtherMaterialDto,
+      data: updatedMaterial,
+      message: 'Material atualizado com sucesso.'
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} otherMaterial`;
+  async remove(id: string): Promise<IDeletedData> {
+    const deletedMaterial = await this.otherMaterialRepository.findOneBy({id: id})
+    await this.otherMaterialRepository.delete(id)
+    return {
+      data: deletedMaterial,
+      message: 'Material deletado com sucesso.'
+    }
   }
 }

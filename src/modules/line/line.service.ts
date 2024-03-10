@@ -4,6 +4,7 @@ import { UpdateLineDto } from './dto/update-line.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LineEntity } from './entities/line.entity';
 import { Repository } from 'typeorm';
+import { ICreatedData, IDeletedData, IUpdatedData } from 'src/shared/types';
 
 @Injectable()
 export class LineService {
@@ -12,7 +13,7 @@ export class LineService {
     private readonly lineRepository: Repository<LineEntity>,
   ){}
 
-  async create(createLineDto: CreateLineDto): Promise<LineEntity> {
+  async create(createLineDto: CreateLineDto): Promise<ICreatedData> {
     const newLine = new LineEntity()
     newLine.lineMark = createLineDto.lineMark
     newLine.lineType = createLineDto.lineType
@@ -26,24 +27,36 @@ export class LineService {
     newLine.otherInformations = createLineDto.otherInformations
 
     await this.lineRepository.save(newLine)
-    return newLine
+    return {
+      data: newLine,
+      message: 'Linha criada com sucesso.'
+    }
   }
 
-  async findAll() {
+  async findAll(): Promise<LineEntity[]> {
     return await this.lineRepository.find();
   }
 
-  async findOne(id: string) {
+  async findOne(id: string): Promise<LineEntity> {
     return await this.lineRepository.findOneBy({id: id});
   }
 
-  async update(id: string, updateLineDto: UpdateLineDto) {    
+  async update(id: string, updateLineDto: UpdateLineDto): Promise<IUpdatedData> {    
     await this.lineRepository.update(id, updateLineDto);
+    const updatedLine = await this.lineRepository.findOneBy({id: id})
+    return{
+      updateData: updateLineDto,
+      data: updatedLine,
+      message: 'Linha atualizada com sucesso.'
+    }
   }
 
-  async remove(id: string) {
+  async remove(id: string): Promise<IDeletedData> {
     const deletedLine = await this.lineRepository.findOneBy({id: id})
     await this.lineRepository.delete(id)
-    return deletedLine
+    return {
+      data: deletedLine,
+      message: 'Linha deletada com sucesso.'
+    }
   }
 }

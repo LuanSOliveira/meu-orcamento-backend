@@ -1,8 +1,10 @@
-import { LineMarkEntity } from "src/modules/line-mark/entities/line-mark.entity";
+import { BudgetEntity } from "src/modules/budget/entities/budget.entity";
+import { LineMarkEntity } from "../../line-mark/entities/line-mark.entity";
 import { LineTypeEntity } from "src/modules/line-type/entities/line-type.entity";
 import { TypeOrmEntity } from "src/shared/entities/shared-typeorm";
-import { Column, ManyToOne } from "typeorm";
+import { Column, Entity, JoinTable, ManyToMany, ManyToOne } from "typeorm";
 
+@Entity('lines')
 export class LineEntity extends TypeOrmEntity{
     @ManyToOne(() => LineMarkEntity, (lineMark) => lineMark.line)
     lineMark: LineMarkEntity;
@@ -33,4 +35,8 @@ export class LineEntity extends TypeOrmEntity{
 
     @Column({name: 'other_informations', length: 1000})
     otherInformations: string;
+
+    @ManyToMany(() => BudgetEntity, (budget) => budget.lines)
+    @JoinTable()
+    budget: BudgetEntity[]
 }

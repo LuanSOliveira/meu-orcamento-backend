@@ -11,11 +11,7 @@ export class LineTypeController {
 
   @Post()
   async create(@Body() createLineTypeDto: CreateLineTypeDto) {
-    const newLineType = await this.lineTypeService.createLineType(createLineTypeDto)
-    return {
-      lineType: newLineType,
-      message: 'Tipo criado com sucesso'
-    }
+    return await this.lineTypeService.createLineType(createLineTypeDto)
   }
 
   @Get()
@@ -30,22 +26,11 @@ export class LineTypeController {
 
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateLineTypeDto: UpdateLineTypeDto) {
-    await this.lineTypeService.updateLineType(id, updateLineTypeDto);
-    return{
-      lineMark:{
-        id: id,
-        name: updateLineTypeDto.name
-      },
-      message: 'Tipo atualizado com sucesso.'
-    }
+    return await this.lineTypeService.updateLineType(id, updateLineTypeDto);
   }
 
   @Delete(':id')
   async remove(@Param('id') id: string) {
-    const deletedType = await this.lineTypeService.deleteLineType(id)
-    return {
-      lineType: deletedType,
-      message: 'Tipo deletado com sucesso.'
-    }
+    return await this.lineTypeService.deleteLineType(id)
   }
 }
