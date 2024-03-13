@@ -23,6 +23,5 @@ export class OtherMaterialEntity extends TypeOrmEntity{
     otherInformations: string
 
     @ManyToMany(() => BudgetEntity, (budget) => budget.materials)
-    @JoinTable()
     budget: BudgetEntity[]
 }

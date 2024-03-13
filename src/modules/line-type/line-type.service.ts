@@ -30,7 +30,11 @@ export class LineTypeService {
 
   async findOneLineType(id: string): Promise<LineTypeEntity> {
     try{
-      return await this.lineTypeRepository.findOneBy({id: id});
+      const lineType = await this.lineTypeRepository.findOneBy({id: id});
+      if(lineType === null){
+        throw new NotFoundException(`O tipo com id: ${id} não foi encontrado.`)
+      }
+      return lineType
     }
     catch(err){
       throw new NotFoundException(`O tipo com id: ${id} não foi encontrado.`)
@@ -38,23 +42,39 @@ export class LineTypeService {
   }
 
   async updateLineType(id: string, updateLineTypeDto: UpdateLineTypeDto): Promise<IUpdatedData> {
-    await this.lineTypeRepository.update(id, updateLineTypeDto)
-    const updatedType = await this.lineTypeRepository.findOneBy({id: id})
-    return{
-      updateData: updateLineTypeDto,
-      data: updatedType,
-      message: 'Tipo atualizado com sucesso.'
+    try{
+      const lineType = await this.lineTypeRepository.findOneBy({id: id});
+      if(lineType === null){
+        throw new NotFoundException(`O tipo com id: ${id} não foi encontrado.`)
+      }
+      await this.lineTypeRepository.update(id, updateLineTypeDto)
+      const updatedType = await this.lineTypeRepository.findOneBy({id: id})
+      return{
+        updateData: updateLineTypeDto,
+        data: updatedType,
+        message: 'Tipo atualizado com sucesso.'
+      }
+    }
+    catch(err){
+      throw new NotFoundException(`O tipo com id: ${id} não foi encontrado.`)
     }
   }
 
   async deleteLineType(id: string): Promise<IDeletedData> {
-    const deletedLineType = await this.lineTypeRepository.findOneBy({id: id})
-    await this.lineTypeRepository.delete(id)
-
-    return {
-      data: deletedLineType,
-      message: 'Tipo deletado com sucesso.'
+    try{
+      const deletedLineType = await this.lineTypeRepository.findOneBy({id: id})
+      if(deletedLineType === null){
+        throw new NotFoundException(`O tipo com id: ${id} não foi encontrado.`)
+      }
+      await this.lineTypeRepository.delete(id)
+  
+      return {
+        data: deletedLineType,
+        message: 'Tipo deletado com sucesso.'
+      }
     }
-
+    catch(err){
+      throw new NotFoundException(`O tipo com id: ${id} não foi encontrado.`)
+    }
   }
 }

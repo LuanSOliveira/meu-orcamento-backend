@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateOtherMaterialDto } from './dto/create-other-material.dto';
 import { UpdateOtherMaterialDto } from './dto/update-other-material.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -34,25 +34,51 @@ export class OtherMaterialService {
   }
 
   async findOne(id: string): Promise<OtherMaterialEntity> {
-    return await this.otherMaterialRepository.findOneBy({id: id})
+    try{
+      const material = await this.otherMaterialRepository.findOneBy({id: id})
+      if(material === null){
+        throw new NotFoundException(`O tipo com id: ${id} não foi encontrado.`)
+      }
+      return material
+    }
+    catch(err){
+      throw new NotFoundException(`O material com id: ${id} não foi encontrado.`)
+    }
   }
 
   async update(id: string, updateOtherMaterialDto: UpdateOtherMaterialDto): Promise<IUpdatedData> {
-    await this.otherMaterialRepository.update(id, updateOtherMaterialDto)
-    const updatedMaterial = await this.otherMaterialRepository.findOneBy({id: id})
-    return {
-      updateData: updateOtherMaterialDto,
-      data: updatedMaterial,
-      message: 'Material atualizado com sucesso.'
+    try{
+      const material = await this.otherMaterialRepository.findOneBy({id: id})
+      if(material === null){
+        throw new NotFoundException(`O tipo com id: ${id} não foi encontrado.`)
+      }
+      await this.otherMaterialRepository.update(id, updateOtherMaterialDto)
+      const updatedMaterial = await this.otherMaterialRepository.findOneBy({id: id})
+      return {
+        updateData: updateOtherMaterialDto,
+        data: updatedMaterial,
+        message: 'Material atualizado com sucesso.'
+      }
+    }
+    catch(err){
+      throw new NotFoundException(`O tipo com id: ${id} não foi encontrado.`)
     }
   }
 
   async remove(id: string): Promise<IDeletedData> {
-    const deletedMaterial = await this.otherMaterialRepository.findOneBy({id: id})
-    await this.otherMaterialRepository.delete(id)
-    return {
-      data: deletedMaterial,
-      message: 'Material deletado com sucesso.'
+    try{
+      const deletedMaterial = await this.otherMaterialRepository.findOneBy({id: id})
+      if(deletedMaterial === null){
+        throw new NotFoundException(`O tipo com id: ${id} não foi encontrado.`)
+      }
+      await this.otherMaterialRepository.delete(id)
+      return {
+        data: deletedMaterial,
+        message: 'Material deletado com sucesso.'
+      }
+    }
+    catch(err){
+      throw new NotFoundException(`O tipo com id: ${id} não foi encontrado.`)
     }
   }
 }

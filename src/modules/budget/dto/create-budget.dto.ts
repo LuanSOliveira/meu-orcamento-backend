@@ -1,7 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsNotEmpty, IsOptional } from "class-validator";
-import { LineEntity } from "src/modules/line/entities/line.entity";
-import { OtherMaterialEntity } from "src/modules/other-material/entities/other-material.entity";
 
 export class CreateBudgetDto {
     @ApiProperty({
@@ -23,14 +21,15 @@ export class CreateBudgetDto {
         example: [],
     })
     @IsNotEmpty({message: 'O orçamento deve ter pelo menos 1 linha.'})
-    lines: LineEntity[];
+    // @MinLength(1, {message: 'O orçamento deve ter pelo menos 1 linha.'})
+    lines: string[];
 
     @ApiProperty({
         description: 'Link de materiais extras',
         example: [],
     })
     @IsOptional()
-    materials: OtherMaterialEntity[];
+    materials: string[];
 
     @ApiProperty({
         description: 'Quantidade de horas adicionais',

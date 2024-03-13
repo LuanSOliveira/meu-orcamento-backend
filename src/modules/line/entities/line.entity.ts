@@ -37,6 +37,5 @@ export class LineEntity extends TypeOrmEntity{
     otherInformations: string;
 
     @ManyToMany(() => BudgetEntity, (budget) => budget.lines)
-    @JoinTable()
     budget: BudgetEntity[]
 }

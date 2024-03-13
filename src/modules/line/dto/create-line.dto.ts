@@ -1,29 +1,21 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsNotEmpty, IsOptional } from "class-validator";
-import { LineMarkEntity } from "src/modules/line-mark/entities/line-mark.entity";
-import { LineTypeEntity } from "src/modules/line-type/entities/line-type.entity";
 
 export class CreateLineDto {
     
     @ApiProperty({
-        description: 'Marca da linha que será atribuída',
-        example: {
-            id: "123456",
-            name: "teste"
-        },
+        description: 'Id da marca da linha que será atribuída',
+        example: "123456"
     })
     @IsNotEmpty({message: 'A Marca é obrigatória'})
-    lineMark: LineMarkEntity;
+    lineMark: string;
 
     @ApiProperty({
-        description: 'Tipo da linha que será atribuída',
-        example: {
-            id: "123456",
-            name: "teste"
-        },
+        description: 'Id do tipo da linha que será atribuído',
+        example: "123456"
     })
     @IsNotEmpty({message: 'O tipo é obrigatório'})
-    lineType: LineTypeEntity;
+    lineType: string;
 
     @ApiProperty({
         description: 'Link da imagem da linha - opcional',
