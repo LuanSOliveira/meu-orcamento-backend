@@ -1,9 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateLineTypeDto } from './dto/create-line-type.dto';
 import { UpdateLineTypeDto } from './dto/update-line-type.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LineTypeEntity } from './entities/line-type.entity';
-import { Repository } from 'typeorm';
+import { QueryFailedError, Repository } from 'typeorm';
 import { ICreatedData, IDeletedData, IUpdatedData } from 'src/shared/types';
 
 @Injectable()
@@ -74,7 +74,11 @@ export class LineTypeService {
       }
     }
     catch(err){
-      throw new NotFoundException(`O tipo com id: ${id} não foi encontrado.`)
+      if (err instanceof QueryFailedError && err.message.includes('violates foreign key constraint')) {
+        throw new BadRequestException('Não é possível excluir este tipo de linha porque existem linhas associadas a ele.');
+      } else {
+        throw new InternalServerErrorException('Ocorreu um erro ao tentar excluir o tipo de linha.');
+      }
     }
   }
 }
