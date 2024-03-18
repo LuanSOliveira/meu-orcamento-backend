@@ -23,14 +23,14 @@ export class UpdateBudgetDto {
         example: [],
     })
     @IsOptional()
-    lines: LineEntity[];
+    lines: string[];
 
     @ApiProperty({
         description: 'Link de materiais extras',
         example: [],
     })
     @IsOptional()
-    materials: OtherMaterialEntity[];
+    materials: string[];
 
     @ApiProperty({
         description: 'Quantidade de horas adicionais',
