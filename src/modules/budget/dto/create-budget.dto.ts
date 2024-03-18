@@ -21,7 +21,6 @@ export class CreateBudgetDto {
         example: [],
     })
     @IsNotEmpty({message: 'O orçamento deve ter pelo menos 1 linha.'})
-    // @MinLength(1, {message: 'O orçamento deve ter pelo menos 1 linha.'})
     lines: string[];
 
     @ApiProperty({

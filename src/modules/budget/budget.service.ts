@@ -83,7 +83,10 @@ export class BudgetService {
   async update(id: string, updateBudgetDto: UpdateBudgetDto): Promise<IUpdatedData> {
     const linesList: LineEntity[] = []
     const materialsList: OtherMaterialEntity[] = []
-    const updateData = {}
+    const updateData = await this.budgetRepository.findOne({ where: { id: id }, relations: {lines: true, materials: true} })
+    if(updateData === null){
+      throw new NotFoundException(`O orçamento com id: ${id} não foi encontrado.`)
+    }
 
     for(const key in updateBudgetDto){
       if(Object.prototype.hasOwnProperty.call(updateBudgetDto, key)){
@@ -98,7 +101,7 @@ export class BudgetService {
               linesList.push(lineById);
             }
           }
-          // updateData[key] = linesList
+          updateData[key] = linesList
         }
         else if(key === 'materials'){
           if(updateBudgetDto.materials.length > 0){
@@ -110,38 +113,16 @@ export class BudgetService {
                 materialsList.push(materialById);
             }
           }
-          // updateData[key] = materialsList
+          updateData[key] = materialsList
         }
         else{
           updateData[key] = value
         }
       }
-    }
-      
+    }      
 
     try{
-      const budget = await this.budgetRepository.findOneBy({id : id})
-      if(budget === null){
-        throw new NotFoundException(`O orçamento com id: ${id} não foi encontrado.`)
-      }
-      console.log('ponto 1')
-
-      if(updateBudgetDto.lines){
-        console.log('ponto 2')
-        await this.budgetRepository.createQueryBuilder()
-        .relation(BudgetEntity, "lines")
-        .of(id)
-        .addAndRemove(linesList, []);
-        
-      }
-
-      if(updateBudgetDto.materials){
-        await this.budgetRepository.createQueryBuilder()
-        .relation(BudgetEntity, "materials")
-        .of(id)
-        .addAndRemove(materialsList, []);
-      }
-      await this.budgetRepository.update(id, updateData)
+      await this.budgetRepository.save(updateData)
       const updatedBudget = await this.budgetRepository.findOne({ where: { id: id }, relations: ['lines', 'lines.lineType', 'lines.lineMark', 'materials'] })
       return {
         updateData: updateBudgetDto,
@@ -150,62 +131,8 @@ export class BudgetService {
       }
     }
     catch(err){
-      throw new NotFoundException(`O orçamento com id: ${id} não foi encontrado.`) 
+      throw new NotFoundException(`O orçamento com id: ${id} não foi encontrado.`)
     }
-    // const linesList: LineEntity[] = []
-    // const materialsList: OtherMaterialEntity[] = []
-    // const updateData = {} 
-
-    // for(const key in updateBudgetDto){
-    //   if(Object.prototype.hasOwnProperty.call(updateBudgetDto, key)){
-    //     const value = updateBudgetDto[key]
-    //     if(key === 'lines'){
-    //       if(updateBudgetDto.lines.length > 0){
-    //         for (const lineId of updateBudgetDto.lines) {
-    //           const lineById = await this.lineRepository.findOne({ where: { id: lineId }, relations: ['lineType', 'lineMark'] });
-    //           if (!lineById) {
-    //               throw new NotFoundException(`A linha com id: ${lineId} não foi encontrada.`);
-    //           }
-    //           linesList.push(lineById);
-    //         }
-    //       }
-    //       updateData[key] = linesList
-    //     }
-    //     else if(key === 'materials'){
-    //       if(updateBudgetDto.materials.length > 0){
-    //         for (const materialId of updateBudgetDto.materials) {
-    //             const materialById = await this.materialRepository.findOne({ where: { id: materialId } });
-    //             if (!materialById) {
-    //                 throw new NotFoundException(`O material com id: ${materialId} não foi encontrado.`);
-    //             }
-    //             materialsList.push(materialById);
-    //         }
-    //       }
-    //       updateData[key] = materialsList
-    //     }
-    //     else{
-    //       updateData[key] = value
-    //     }
-    //   }
-    // }
-      
-
-    // try{
-    //   const budget = await this.budgetRepository.findOneBy({id : id})
-    //   if(budget === null){
-    //     throw new NotFoundException(`O orçamento com id: ${id} não foi encontrado.`)
-    //   }
-    //   await this.budgetRepository.update(id, updateData)
-    //   const updatedBudget = await this.budgetRepository.findOne({ where: { id: id }, relations: ['lines', 'lines.lineType', 'lines.lineMark', 'materials'] })
-    //   return {
-    //     updateData: updateBudgetDto,
-    //     data: updatedBudget,
-    //     message: 'Orçamento atualizado com sucesso.'
-    //   }
-    // }
-    // catch(err){
-    //   throw new NotFoundException(`O orçamento com id: ${id} não foi encontrado.`) 
-    // }
   }
 
   async remove(id: string): Promise<ICreatedData> {
