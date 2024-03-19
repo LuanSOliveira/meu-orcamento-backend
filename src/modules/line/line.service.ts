@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { ICreatedData, IDeletedData, IUpdatedData } from 'src/shared/types';
 import { LineTypeEntity } from '../line-type/entities/line-type.entity';
 import { LineMarkEntity } from '../line-mark/entities/line-mark.entity';
+import { IPaginationOptions, Pagination, paginate } from 'nestjs-typeorm-paginate';
 
 @Injectable()
 export class LineService {
@@ -49,11 +50,27 @@ export class LineService {
     }
   }
 
-  async findAll(): Promise<LineEntity[]> {
-    return await this.lineRepository.createQueryBuilder('line')
-    .leftJoinAndSelect('line.lineType', 'lineType')
-    .leftJoinAndSelect('line.lineMark', 'lineMark')
-    .getMany();
+  async findAll(options: IPaginationOptions, filter: string, filterBy: 'mark' | 'type'): Promise<Pagination<LineEntity>> {
+    const queryBuilder = this.lineRepository.createQueryBuilder('l')
+    .select([
+      'l.id', 'l.lineMark', 'l.lineType', 'l.imageLink', 'l.value', 'l.weightLine',
+      'l.pointsPerWeightQt', 'l.weightPerPoints', 'l.hoursPointsQt', 'l.minutesPerPoints', 'l.otherInformations',
+      'l.created_at', 'l.updated_at',
+    ])
+    .leftJoinAndSelect('l.lineMark', 'lineMark')
+    .leftJoinAndSelect('l.lineType', 'lineType')
+    .orderBy('l.id', 'ASC');
+
+    if(filter){
+      if(filterBy === 'type'){
+        queryBuilder.andWhere('lineType.name LIKE :name', {name: `%${filter}%`})
+      }
+      else if(filterBy === 'mark'){
+        queryBuilder.andWhere('lineMark.name LIKE :name', {name: `%${filter}%`})
+      }
+    }
+
+    return paginate<LineEntity>(queryBuilder, options)
   }
 
   async findOne(id: string): Promise<LineEntity> {
