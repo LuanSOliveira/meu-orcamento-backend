@@ -1,6 +1,6 @@
 import { BudgetEntity } from "src/modules/budget/entities/budget.entity";
 import { TypeOrmEntity } from "src/shared/entities/shared-typeorm";
-import { Column, Entity, JoinTable, ManyToMany } from "typeorm";
+import { Column, Entity, ManyToMany } from "typeorm";
 
 @Entity('other-materials')
 export class OtherMaterialEntity extends TypeOrmEntity{

@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { OtherMaterialEntity } from './entities/other-material.entity';
 import { Repository } from 'typeorm';
 import { ICreatedData, IDeletedData, IUpdatedData } from 'src/shared/types';
+import { IPaginationOptions, Pagination, paginate } from 'nestjs-typeorm-paginate';
 
 @Injectable()
 export class OtherMaterialService {
@@ -29,8 +30,23 @@ export class OtherMaterialService {
     }
   }
 
-  async findAll(): Promise<OtherMaterialEntity[]> {
-    return await this.otherMaterialRepository.find()
+  async findAll(options: IPaginationOptions, filter: string, filterBy: 'name' | 'type'): Promise<Pagination<OtherMaterialEntity>> {
+    const queryBuilder = this.otherMaterialRepository.createQueryBuilder('material')
+    .select([
+      'material.id', 'material.name', 'material.type', 'material.imageLink', 'material.value', 'material.weight',
+      'material.otherInformations', 'material.created_at', 'material.updated_at',
+    ])
+    .orderBy('material.id', 'ASC');
+
+    if(filter){
+      if(filterBy === 'type'){
+        queryBuilder.andWhere('LOWER(material.type) LIKE :type', {type: `%${filter.toLocaleLowerCase()}%`})
+      }
+      else if(filterBy === 'name'){
+        queryBuilder.andWhere('LOWER(material.name) LIKE :name', {name: `%${filter.toLocaleLowerCase()}%`})
+      }
+    }
+    return paginate<OtherMaterialEntity>(queryBuilder, options)
   }
 
   async findOne(id: string): Promise<OtherMaterialEntity> {

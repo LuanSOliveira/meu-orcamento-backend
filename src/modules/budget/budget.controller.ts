@@ -1,8 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { BudgetService } from './budget.service';
 import { CreateBudgetDto } from './dto/create-budget.dto';
 import { UpdateBudgetDto } from './dto/update-budget.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiQuery, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('budget')
 @Controller('budget')
@@ -15,8 +15,16 @@ export class BudgetController {
   }
 
   @Get()
-  async findAll() {
-    return await this.budgetService.findAll();
+  @ApiQuery({name: 'page', required: false, type: Number})
+  @ApiQuery({name: 'limit', required: false, type: Number})
+  @ApiQuery({name: 'filter', required: false, type: String})
+  async findAll(
+    @Query('page') page = 1, 
+    @Query('limit') limit = 15, 
+    @Query('filter') filter: string,
+  ) {
+    limit = (limit > 15) ? 15 : limit
+    return await this.budgetService.findAll({page, limit}, filter);
   }
 
   @Get(':id')

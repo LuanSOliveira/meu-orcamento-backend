@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { ICreatedData, IUpdatedData } from 'src/shared/types';
 import { LineEntity } from '../line/entities/line.entity';
 import { OtherMaterialEntity } from '../other-material/entities/other-material.entity';
+import { IPaginationOptions, Pagination, paginate } from 'nestjs-typeorm-paginate';
 
 @Injectable()
 export class BudgetService {
@@ -55,14 +56,23 @@ export class BudgetService {
     };
   }
 
-  async findAll(): Promise<BudgetEntity[]> {
-    return await this.budgetRepository.find({
-      relations: ['lines', 'lines.lineType', 'lines.lineMark', 'materials']
-      // relations: {
-      //   lines: true,
-      //   materials: true
-      // }
-    })
+  async findAll(options: IPaginationOptions, filter: string): Promise<Pagination<BudgetEntity>> {
+    const queryBuilder = this.budgetRepository.createQueryBuilder('budget')
+    .select([
+      'budget.id', 'budget.name', 'budget.linkRecipe', 'budget.extraTime',
+      'budget.freight', 'budget.created_at', 'budget.updated_at',
+    ])
+    .leftJoinAndSelect('budget.lines', 'lines')
+    .leftJoinAndSelect('lines.lineMark', 'lineMark')
+    .leftJoinAndSelect('lines.lineType', 'lineType')
+    .leftJoinAndSelect('budget.materials', 'materials')
+    .orderBy('budget.name', 'ASC');
+
+    if(filter){
+      queryBuilder.andWhere('LOWER(budget.name) LIKE :name', {name: `%${filter.toLocaleLowerCase()}%`})
+    }
+
+    return paginate<BudgetEntity>(queryBuilder, options)
   }
 
   async findOne(id: string): Promise<BudgetEntity> {

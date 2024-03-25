@@ -63,10 +63,10 @@ export class LineService {
 
     if(filter){
       if(filterBy === 'type'){
-        queryBuilder.andWhere('lineType.name LIKE :name', {name: `%${filter}%`})
+        queryBuilder.andWhere('LOWER(lineType.name) LIKE :name', {name: `%${filter.toLocaleLowerCase()}%`})
       }
       else if(filterBy === 'mark'){
-        queryBuilder.andWhere('lineMark.name LIKE :name', {name: `%${filter}%`})
+        queryBuilder.andWhere('LOWER(lineMark.name) LIKE :name', {name: `%${filter.toLocaleLowerCase()}%`})
       }
     }
 
