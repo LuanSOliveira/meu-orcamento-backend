@@ -3,7 +3,7 @@ import { LineService } from './line.service';
 import { CreateLineDto } from './dto/create-line.dto';
 import { UpdateLineDto } from './dto/update-line.dto';
 import { ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { successfulCreateLine, successfulDeleteLine, successfulFindAllLine } from './docs';
+import { successfulCreateLine, successfulDeleteLine, successfulFindAllLine, successfulFindOneLine, successfullUpdateLine } from './docs';
 
 enum FilterByType {
   Mark = 'mark',
@@ -37,11 +37,13 @@ export class LineController {
     return await this.lineService.findAll({page, limit}, filter, filterBy);
   }
 
+  @ApiResponse(successfulFindOneLine)
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return await this.lineService.findOne(id);
   }
 
+  @ApiResponse(successfullUpdateLine)
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateLineDto: UpdateLineDto) {
     return await this.lineService.update(id, updateLineDto)
